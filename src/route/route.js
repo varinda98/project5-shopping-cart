@@ -1,41 +1,22 @@
 const express = require("express");
 const router = express.Router();
+const userController = require('../controller/userController.js')
+const MW = require('../middleware/MW.js')
+const{createProduct,getProductsById,getProductsByFilter,updateProduct,deleteProduct}=require("../controller/productController")
 
 
 
-aws.config.update({
-    accessKeyId: "AKIAY3L35MCRZNIRGT6N",
-    secretAccessKey: "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",
-    region: "ap-south-1"
-})
+ router.post('/register',userController.createUser)
+ router.post('/login',userController.loginUser)
+ router.get('/user/:userId/profile',MW.Authentication,userController.getUserById)
+ router.put('/user/:userId/profile',MW.Authentication,MW.Authorisation,userController.updateUserProfile)
 
 
-let uploadFile= async ( file) =>{
-    return new Promise( function(resolve, reject) {
-     
-     let s3= new aws.S3({apiVersion: '2006-03-01'}); 
- 
-     var uploadParams= {
-         ACL: "public-read",
-         Bucket: "classroom-training-bucket", 
-         Key: "abc/" + file.originalname, 
-         Body: file.buffer
-     }
- 
- 
-     s3.upload( uploadParams, function (err, data ){
-         if(err) {
-             return reject({"error": err})
-         }
-         // console.log(data)
-         // console.log("file uploaded succesfully")
-         return resolve(data.Location)
-     })
- 
-     
- 
-    })
- }
+ router.post("/products",createProduct)
+router.get("/products/:productId",getProductsById)
+router.get("/products", getProductsByFilter)
+ router.put("/products/:productId",updateProduct)
+router.delete("/products/:productId",deleteProduct)
 
 router.all("/*", function(req, res){
     return res.status(400).send({status: false, msg: "Path not found" })
