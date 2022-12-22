@@ -12,9 +12,7 @@
   },
   "author": "\"Anand Kumar\"",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/AK-viHaAn/Project_5/issues"
-  },
+ 
   "homepage": "https://github.com/AK-viHaAn/Project_5#readme",
   "dependencies": {
     "aws-sdk": "^2.1278.0",
