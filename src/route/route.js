@@ -22,6 +22,7 @@ router.delete("/products/:productId",deleteProduct)
 
 
 router.post("/users/:userId/cart",cartController.createCart)
+router.put("/users/:userId/cart",cartController.updateCart)
 
 router.all("/*", function(req, res){
     return res.status(400).send({status: false, msg: "Path not found" })
