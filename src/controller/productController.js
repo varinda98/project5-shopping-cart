@@ -58,7 +58,7 @@ const createProduct = async function (req, res) {
         if (!valid(currencyFormat)) {
             return res.status(400).send({ status: "false", message: "currencyFormat must be present" });
         }
-        console.log(price)
+        // console.log(price)
         if(price){
             price = parseInt(price)
             console.log(price)
@@ -101,7 +101,7 @@ const createProduct = async function (req, res) {
         
     }
     catch (error) {
-        console.log("This is the error :", error.message)
+        // console.log("This is the error :", error.message)
         res.status(500).send({ status: false, data: error.message })
     }
 }
