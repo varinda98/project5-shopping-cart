@@ -1,6 +1,6 @@
 const mongoose=require("mongoose");
 const valid=function(value){
-    if(typeof value=="number" || typeof value==null || typeof value==undefined)
+    if(typeof value=="number" || typeof value==null || typeof value==undefined)     
     return false
     if(typeof value=="string" && value.trim().length==0)
     return false
