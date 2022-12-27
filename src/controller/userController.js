@@ -31,9 +31,9 @@ const createUser = async function (req, res) {
 
     let { fname, lname, email, phone, password, address, profileImage } = data;
     //------------------------------checking presence of keys-------------------------
-    if(!fname) {return res.status(400).send({ status: "false", message: "fname is mandatory" })};
-    if(!lname) {return res.status(400).send({ status: "false", message: "lname is mandatory" })};
-    if(!email) {return res.status(400).send({ status: "false", message: "email is mandatory " })};
+    if(!fname) {return res.status(400).send({ status: "false", message: "fname is mandatory" })};          //fname  {fname}
+    if(!lname) {return res.status(400).send({ status: "false", message: "lname is mandatory" })};    //lname
+    if(!email) {return res.status(400).send({ status: "false", message: "email is mandatory " })};        //email
     if(!phone) {return res.status(400).send({ status: "false", message: "phone is mandatory" })};
     if(!password) {return res.status(400).send({ status: "false", message: "password is mandatory" })};
     if(!address) {return res.status(400).send({ status: "false", message: "address is mandatory" })};
@@ -69,7 +69,7 @@ const createUser = async function (req, res) {
     if (!isValidPassword(password)) {
       return res.status(400).send({ status: "false", message: "password must be present" });
     }
-    if (password.length < 8 || password.length > 15) {
+    if (password.length < 8 || password.length > 15) {              
       return res.status(400).send({ status: false, message: "Length of password is not correct" })
     }
     if (!valid(address)) {

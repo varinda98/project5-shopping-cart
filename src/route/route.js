@@ -9,7 +9,7 @@ const cartController = require('../controller/cartController')
 
  router.post('/register',userController.createUser)
  router.post('/login',userController.loginUser)
- router.get('/user/:userId/profile',MW.Authentication,userController.getUserById)
+ router.get('/user/:userId/profile',userController.getUserById)
  router.put('/user/:userId/profile',MW.Authentication,MW.Authorisation,userController.updateUserProfile)
 
 
