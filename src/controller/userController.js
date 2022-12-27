@@ -12,7 +12,8 @@ const {
   isValidPhone,
   isValidPassword,
   isvalidPincode,
-  isValidStreet
+  isValidStreet,
+  isValidString
 } = require("../validator/validations");
 
 
@@ -67,7 +68,7 @@ const createUser = async function (req, res) {
       return res.status(400).send({ status: "false", message: "password must be present" });
     }
     if (!isValidPassword(password)) {
-      return res.status(400).send({ status: "false", message: "password must be present" });
+      return res.status(400).send({ status: "false", message: "Password must be present" });
     }
     if (password.length < 8 || password.length > 15) {              
       return res.status(400).send({ status: false, message: "Length of password is not correct" })
@@ -152,7 +153,9 @@ const createUser = async function (req, res) {
 const loginUser = async function (req, res) {
   try {
     let data = req.body;
-    let { email, password } = data;
+    let { email , password } = data;
+    // const email = req.body.email
+    // const password = req.body.password
 
     if (Object.keys(data).length == 0)
       return res
