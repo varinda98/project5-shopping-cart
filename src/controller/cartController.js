@@ -2,7 +2,15 @@ const cartModel = require('../model/cartModel')
 const mongoose = require("mongoose")
 const productModel = require('../model/productModel')
 const userModel = require("../model/userModel");
-const validator = require('../validator/validations');
+const {
+    valid,
+    isValidEmail,
+    isValidName,
+    isValidPhone,
+    isValidPassword,
+    isvalidPincode,
+    isValidStreet
+  } = require("../validator/validations");
 
 
 
@@ -38,11 +46,13 @@ const createCart = async function (req, res) {
             return res.status(404).send({ status: false, msg: "Product not Exists" })
         }
         let cartId = req.body.cartId
-        if (!cartId) {
+        if (cartId){
+        if (valid(cartId)== false) {
             return res.status(400).send({ status: false, msg: "provide Cart Id" })
         }
         if (mongoose.Types.ObjectId.isValid(cartId) == false) {
             return res.status(400).send({ status: false, msg: "Invalid Cart Id" })
+        }
         }
         let cartExists = await cartModel.findOne({ userId: userId })
         let price = productExists.price
@@ -59,15 +69,16 @@ const createCart = async function (req, res) {
             }
             let creatNewCart = await cartModel.create(newCart)
             return res.status(201).send({ status: true, msg: creatNewCart })
-        } else {
+         }
+            if (cartExists)
             if (!cartId) {
                 return res.status(404).send({ status: false, message: "provide Cart Id for the User" })
             }
             let usersCartId = cartExists._id
-            if (cartId != usersCartId) {
+            if (usersCartId !=  cartId) {
                 return res.status(404).send({ status: false, message: "Cart id is not matched with this User" })
             }
-        }
+       
         let allItems = cartExists.items
         for (let i = 0; i < allItems.length; i++) {
             if (allItems[i].productId == productId) {
@@ -80,7 +91,7 @@ const createCart = async function (req, res) {
         let cartPrice = cartExists.totalPrice
         let cartItem = cartExists.totalItems
         let newItems = {
-            $addToSet: { items: { productId: newProductId, quantity } },
+            $addToSet: { items: { productId: newProductId, quantity:1 } },
             totalPrice: price + cartPrice,
             totalItems: cartItem + 1
         }
