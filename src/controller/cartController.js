@@ -9,12 +9,15 @@ const {
     isValidPhone,
     isValidPassword,
     isvalidPincode,
-    isValidStreet
+    isValidStreet,
+    isIdValid
   } = require("../validator/validations");
 
 
 
-
+//____________________________________________________________________________________________________________________________
+//==============================================================================================================================
+//_____________________________________________________________________________________________________________________________
 
 
 const createCart = async function (req, res) {
@@ -103,6 +106,10 @@ const createCart = async function (req, res) {
 }
 
 
+//____________________________________________________________________________________________________________________________
+//==============================================================================================================================
+//_____________________________________________________________________________________________________________________________
+
 
 
 const updateCart = async function (req, res) {
@@ -166,10 +173,13 @@ const updateCart = async function (req, res) {
                 }
             }
         }
-        if (removeProduct == 1) {
+
+
+        else if (removeProduct == 1) {
             for (let i = 0; i < cartExists.items.length; i++) {
                 if (cartExists.items[i].productId == productId) {
                     const updatedQuantity = cartExists.items[i].quantity - 1
+
                     if (updatedQuantity < 1) {
                         let productPrice = productExists.price * cartExists.items[i].quantity
                         let finalprice = cartExists.totalPrice - productPrice
@@ -178,6 +188,15 @@ const updateCart = async function (req, res) {
                         let finalUpdatedPrice = await cartModel.findOneAndUpdate({ userId: userId }, { items: cartExists.items, totalPrice: finalprice, totalItems: totalItems }, { new: true })
                         return res.status(200).send({ status: true, message: "Cart Successfully Updated", data: finalUpdatedPrice })
 
+                    }else {
+                        let finalprice = cartExists.totalPrice - productExists.price
+                        let totalItems = cartExists.totalItems
+                        cartExists.items[i].quantity = updatedQuantity
+
+                        let finalUpdatedPrice = await cartModel.findOneAndUpdate({ userId: userId }, { items: cartExists.items, totalPrice: finalprice, totalItems: totalItems }, { new: true })
+                        return res.status(200).send({ status: true, message: "Cart Successfully Updated", data: finalUpdatedPrice })
+
+            
                     }
                 }
             }
@@ -190,6 +209,62 @@ const updateCart = async function (req, res) {
 }
 
 
+//____________________________________________________________________________________________________________________________
+//==============================================================================================================================
+//_____________________________________________________________________________________________________________________________
+
+
+const getCartById = async function (req, res) {
+    try {
+        let userId = req.params.userId
+        if (!userId) { return res.status(400).send({ status: false, message: "userId is mandatory" }) }
+        if (!isIdValid(userId)) { return res.status(400).send({ status: false, message: "userId is invalid" }) }
+        let userExist = await userModel.findOne({ _id: userId, isDeleted: false })
+        if (!userExist) { return res.status(400).send({ status: false, message: "user doesnot exist or deleted" }) }
+        let cartExist = await cartModel.findOne({ userId: userId })
+        if (!cartExist) { return res.status(400).send({ status: false, message: "cart doesnot exist" }) }
+        let arr = []
+        let items = cartExist['items']
+
+        for (let i = 0; i < items.length; i++) {
+            let pId = items[i]['productId']
+
+            //console.log(pId)
+            arr[i] = await productModel.findOne({ _id: pId, isDeleted: false })
+
+        }
+        res.status(200).send({ status: true, data: arr })
+    }
+    catch (err) {
+        res.status(500).send({ status: false, message: err.message })
+    }
+
+}
+
+
+//____________________________________________________________________________________________________________________________
+//==============================================================================================================================
+//_____________________________________________________________________________________________________________________________
+
+const deleteCart = async function (req, res) {
+    try {
+        let userId = req.params.userId
+        if (!userId) { return res.status(400).send({ status: false, message: "userId is mandatory" }) }
+        if (!isIdValid(userId)) { return res.status(400).send({ status: false, message: "userId is invalid" }) }
+        let userExist=await userModel.findOne({_id:userId,isDeleted:false})
+        if(!userExist){return res.status(404).send({ status: false, message: "No user found with this Id" })}
+        let cartExist = await cartModel.findOne({ userId: userId })
+        if (!cartExist) { return res.status(404).send({ status: false, message: "cart is already deleted" }) }
+        let cartDelete = await cartModel.findOneAndUpdate({ userId: userId ,_id:cartExist._id}, { $set: { items: [], totalItems: 0, totalPrice: 0 } },{new:true})
+        if (!cartDelete) { return res.status(400).send({ status: false, message: "cart doesnot exist" }) }
+        res.status(201).send({ status: true, message: " cart successfully deleted " })
+    }
+    catch (err) {
+        res.status(500).send({ status: false, message: err.message })
+    }
+}
 
 module.exports.createCart = createCart
 module.exports.updateCart = updateCart
+module.exports.getCartById = getCartById
+module.exports.deleteCart = deleteCart
