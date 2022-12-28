@@ -2,12 +2,8 @@ const orderModel = require('../model/orderModel')
 const mongoose = require("mongoose")
 const userModel = require("../model/userModel");
 const cartModel = require('../model/cartModel')
-
-
-
-
-
-
+const{isIdValid}=require("../validator/validations")
+//======================createOrder===========================
 const createOrder = async function (req, res){
     try {
 
@@ -68,7 +64,56 @@ const createOrder = async function (req, res){
         res.status(500).send({ status : false, message : error.message})
     }
 }
+//=====================update================================
+const updateOrder = async function (req, res){
+    try {
+
+        let data = req.body
+        let userId = req.params.userId
+
+        let{ orderId, status} = data
+
+
+        if(!(userId)){
+            return res.status(400).send({ status : false, message : "UserId is missing in params"})
+        }
+
+        if(!isIdValid(userId)){
+            return res.status(400).send({ status : false, message : "invalid UserId"})
+        }
+
+        let userCheck = await userModel.findOne({_id:userId})
+        if(!userCheck){
+            return res.status(404).send({ status : false, message : "This userId is not found"})
+        }
+
+         if(!orderId){
+            return res.status(400).send({ status : false, message : "OrderId is missing"})
+         }
+         if(!isIdValid(orderId)){return res.status(400).send({ status : false, message : "OrderId is invalid"})}
+
+        
+        let checkstatus=await orderModel.findOne({_id:orderId,isDeleted:false})
+        if(checkstatus.userId.toString()!==userId){return res.status(400).send({status:false,message:"this order doesnot belong to the user"})}
+         let cancellable=checkstatus.cancellable
+         if(cancellable==false){return res.status(400).send({ status : false, message : "Order is not cancellable"})}
+        let newStatus = {}
+        if(status){
+            if(!(status =="completed" || status == "cancelled")){
+                return res.status(400).send({ status : false, message : "status can be from enum only"})
+            }else{
+                newStatus.status = status
+            }
+        }
+
+        const orderCancel = await orderModel.findOneAndUpdate({ _id:orderId },{$set:newStatus},{ new: true });
+        return res.status(200).send({ status: true, message: "Success", data: orderCancel });
+    }catch(err){
+        res.status(500).send(err.message);
+    }
+};
 
 
 
 module.exports.createOrder=createOrder
+module.exports.updateOrder=updateOrder

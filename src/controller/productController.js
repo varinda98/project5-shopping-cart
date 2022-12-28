@@ -127,7 +127,7 @@ const getProductsById = async function (req, res) {
 };
 
 
-
+//-----------------------getproductsbyfilter------------------------------
 const getProductsByFilter = async function (req, res) {
     try {
         const { size, name, priceGreaterThan, priceLessThan, priceSort } = req.query
