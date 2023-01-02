@@ -59,6 +59,7 @@ const createProduct = async function (req, res) {
             return res.status(400).send({ status: "false", message: "currencyFormat must be present" });
         }
 
+        // type casting
         if (price) {
             price = parseInt(price)
 
@@ -133,7 +134,7 @@ const getProductsByFilter = async function (req, res) {
         const { size, name, priceGreaterThan, priceLessThan, priceSort } = req.query
         let data = { isDeleted: false }
         if (size) {
-            data['availableSizes'] = { $in: size }
+            data['availableSizes'] = { $in: size }    // include check in array
         }
         if (name) {
 
@@ -245,8 +246,11 @@ const updateProduct = async function (req, res) {
 const deleteProduct = async function (req, res) {
     try {
         let productId = req.params.productId
+
         if (!isIdValid(productId)) { return res.status(400).send({ status: false, msg: "Invalid productId" }) }
+
         let deleteProduct = await productModel.findOneAndUpdate({ _id: productId, isDeleted: false }, { isDeleted: true, deletedAt: Date.now() }, { new: true })
+        
         if (!deleteProduct) { return res.status(400).send({ status: false, msg: "product is already deleted" }) }
         res.status(200).send({ status: true, msg: "product is successfully deleted" })
     }

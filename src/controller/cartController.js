@@ -249,13 +249,21 @@ const getCartById = async function (req, res) {
 const deleteCart = async function (req, res) {
     try {
         let userId = req.params.userId
+
         if (!userId) { return res.status(400).send({ status: false, message: "userId is mandatory" }) }
+
         if (!isIdValid(userId)) { return res.status(400).send({ status: false, message: "userId is invalid" }) }
+
         let userExist=await userModel.findOne({_id:userId,isDeleted:false})
+
         if(!userExist){return res.status(404).send({ status: false, message: "No user found with this Id" })}
+
         let cartExist = await cartModel.findOne({ userId: userId })
+
         if (!cartExist) { return res.status(404).send({ status: false, message: "cart is already deleted" }) }
+
         let cartDelete = await cartModel.findOneAndUpdate({ userId: userId ,_id:cartExist._id}, { $set: { items: [], totalItems: 0, totalPrice: 0 } },{new:true})
+        
         if (!cartDelete) { return res.status(400).send({ status: false, message: "cart doesnot exist" }) }
         res.status(201).send({ status: true, message: " cart successfully deleted " })
     }
